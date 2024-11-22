@@ -67,25 +67,31 @@ class manager:
     def ChangeMemory(self, this_info, _memory):
         ##condor_qedit <JobID> RequestMemory 
         _memory=str(int(_memory))
-        jid=GetJid(this_info)
+        jid=self.GetJid(this_info)
         command="condor_qedit "+jid+" RequestMemory "+_memory
         os.system(command)
     def ChangePrio(self, this_info, _prio):
         ##condor_qedit <JobID> RequestMemory 
         _prio=str(int(_prio))
-        jid=GetJid(this_info)
+        jid=self.GetJid(this_info)
         command="condor_prio -p "+_prio+" "+jid
         os.system(command)
+    def ChangePrioUsingClusterId(self,_clusterid,_prio):
+        _prio=str(_prio)
+        _clusterid=str(_clusterid)
+        os.system("condor_prio -p "+_prio+" "+_clusterid)
+    def GetClusterIdFromJid(self,_jid):
+        return _jid.split(".")[0]
 if __name__ == '__main__':
     key="hadd"
+
     myjob=manager()
 
     for info in myjob.info:
         
         batchname=myjob.GetBatchName(info)
         jid = myjob.GetJid(info)
-        #print batchname
         if key in batchname:
             print batchname,jid
-            ChangeMemory(info,60000)
-            ChangePrio(info,1)
+            myjob.ChangeMemory(info,60000)
+            myjob.ChangePrio(info,1)
