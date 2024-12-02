@@ -43,8 +43,8 @@ class manager:
         exec("self.info="+str(lines_str))
 
         f.close()
-        #os.system("rm "+jobinfofile)
-        #os.system("rmdir "+tempdir_name)
+        os.system("rm "+jobinfofile)
+        os.system("rmdir "+tempdir_name)
         return self.info
         #JobBatchName
         #JobStatus
@@ -82,9 +82,18 @@ class manager:
         os.system("condor_prio -p "+_prio+" "+_clusterid)
     def GetClusterIdFromJid(self,_jid):
         return _jid.split(".")[0]
+    def ChangeConcurrencyLimits(self,this_info,_concurrency_limits):
+        _concurrency_limits="n"+str(int(_concurrency_limits))+"."+self.user
+        jid=self.GetJid(this_info)
+        #command="condor_qedit "+jid+" concurrency_limits "+_concurrency_limits
+        command="condor_qedit "+jid+" ConcurrencyLimits "+_concurrency_limits
+        os.system(command)
+        
 if __name__ == '__main__':
-    key="hadd"
-
+    #key="hadd"
+    #key="TTsemi"
+    key="2017"
+    #key=""
     myjob=manager()
 
     for info in myjob.info:
@@ -93,5 +102,11 @@ if __name__ == '__main__':
         jid = myjob.GetJid(info)
         if key in batchname:
             print batchname,jid
-            myjob.ChangeMemory(info,60000)
-            myjob.ChangePrio(info,1)
+            ##---For hadd
+            #myjob.ChangeMemory(info,120000)
+            #myjob.ChangePrio(info,2)
+            #myjob.ChangeConcurrencyLimits(info,1000)
+
+            ##--For sample
+            myjob.ChangeConcurrencyLimits(info,150)
+            #myjob.ChangePrio(info,3)
